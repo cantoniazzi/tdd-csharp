@@ -141,5 +141,84 @@ namespace TDD.LeilaoTests
             Assert.AreEqual(maiorEsperado, avaliador.MaiorLance);
             Assert.AreEqual(menorEsperado, avaliador.MenorLance);
         }
+
+        [TestMethod]
+        public void Testa2LancesEmSequenciaDeUsuario()
+        {
+            Usuario cassio = new Usuario("Cassio");
+            Usuario josias = new Usuario("Josias");
+
+            Leilao leilao = new Leilao("Travel to Canada");
+
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(cassio, 2000));
+            leilao.Propoe(new Lance(cassio, 3000));
+            leilao.Propoe(new Lance(josias, 4000));
+            
+            //tests
+            Assert.AreEqual(2, leilao.Lances.Count);
+            
+            leilao.Propoe(new Lance(cassio, 1000));
+
+            //tests
+            Assert.AreEqual(3, leilao.Lances.Count);
+        }
+
+        [TestMethod]
+        public void NaoDeveAceitarMaisDoQue5LancesDeUmMesmoUsuario()
+        {
+            Usuario cassio = new Usuario("Cassio");
+            Usuario josias = new Usuario("Josias");
+
+            Leilao leilao = new Leilao("Travel to Canada");
+
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(josias, 2000));
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(josias, 2000));
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(josias, 2000));
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(josias, 2000));
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(josias, 2000));
+            leilao.Propoe(new Lance(cassio, 1000));
+
+            //tests
+            Assert.AreEqual(10, leilao.Lances.Count);
+        }
+
+        [TestMethod]
+        public void TestaDobrarLanceDeUmUsuario()
+        {
+            Usuario cassio = new Usuario("Cassio");
+            Usuario josias = new Usuario("Josias");
+
+            Leilao leilao = new Leilao("Travel to Canada");
+
+            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(josias, 1100));
+            leilao.DobrarLance(cassio);
+
+            Assert.AreEqual(3, leilao.Lances.Count);
+        }
+
+        [TestMethod]
+        public void NaoDeveDobrarCasoUsuarioNaoTenhaDadoLance()
+        {
+            Usuario cassio = new Usuario("Cassio");
+            Usuario josias = new Usuario("Josias");
+
+            Leilao leilao = new Leilao("Travel to Canada");
+
+            leilao.Propoe(new Lance(cassio, 1000));
+
+            leilao.DobrarLance(josias);
+
+            Assert.AreEqual(1, leilao.Lances.Count);
+
+        }
+
+        
     }
 }
