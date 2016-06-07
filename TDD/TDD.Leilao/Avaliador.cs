@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TDDLeilao
@@ -10,6 +11,9 @@ namespace TDDLeilao
         private IList<Lance> maiores;
         public void Avalia(Leilao leilao)
         {
+            if (leilao.Lances.Count == 0)
+                throw new Exception("Não é possível avaliar leilão sem lances");
+
             foreach (Lance lance in leilao.Lances)
             {
                 if (lance.Valor > maiorDeTodos) maiorDeTodos = lance.Valor;

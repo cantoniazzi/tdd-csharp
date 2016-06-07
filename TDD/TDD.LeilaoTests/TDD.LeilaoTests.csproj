@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AvaliadorTest.cs" />
     <Compile Include="FiltroDeLancesTest.cs" />
+    <Compile Include="LanceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

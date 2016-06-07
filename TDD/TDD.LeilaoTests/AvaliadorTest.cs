@@ -1,36 +1,54 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TDDLeilao;
 using System.Collections.Generic;
+using System;
 
 namespace TDD.LeilaoTests
 {
     [TestClass]
     public class AvaliadorTest
     {
+        private Avaliador leiloeiro;
+        private Usuario joao;
+        private Usuario jose;
+        private Usuario maria;
+        
+        [TestInitialize]
+        public void CriaAvaliador()
+        {
+            this.leiloeiro = new Avaliador();
+            this.joao = new Usuario("João");
+            this.jose = new Usuario("José");
+            this.maria = new Usuario("Maria");
+
+            Console.WriteLine("inicializando teste!");
+        }
+
+        [TestCleanup]
+        public void Finaliza()
+        {
+            Console.WriteLine("fim");
+        }
+
         [TestMethod]
         public void TestMethodAvaliador()
         {
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("Jose");
-            Usuario maria = new Usuario("Maria");
-
-            Leilao leilao = new Leilao("Moutain Bike");
-
-            leilao.Propoe(new Lance(maria, 250.0));
-            leilao.Propoe(new Lance(joao, 300.0));
-            leilao.Propoe(new Lance(jose, 400.0));
-
-            //actions
-            Avaliador avaliador = new Avaliador();
-            avaliador.Avalia(leilao);
+            Leilao leilao = new CriadoDeLeilao().Para("Moutain Bike")
+                .Lance(this.maria, 250.0)
+                .Lance(this.joao, 300.0)
+                .Lance(this.jose, 400.0)
+                .Constroi();
+            
+            this.CriaAvaliador();
+            this.leiloeiro.Avalia(leilao);
             
             double maiorEsperado = 400;
             double menorEsperado = 250;
             //double mediaEsperada = (250.0 + 300.0 + 400.0) / 3;
 
             //tests
-            Assert.AreEqual(maiorEsperado, avaliador.MaiorLance);
-            Assert.AreEqual(menorEsperado, avaliador.MenorLance);
+            Assert.AreEqual(maiorEsperado, leiloeiro.MaiorLance);
+            Assert.AreEqual(menorEsperado, leiloeiro.MenorLance);
             //Assert.AreEqual(mediaEsperada, avaliador.MediaLance);
 
         }
@@ -38,42 +56,34 @@ namespace TDD.LeilaoTests
         [TestMethod]
         public void DeveEncontrarOsTresMaioresLances()
         {
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("Jose");
-            Usuario maria = new Usuario("Maria");
-
-            Leilao leilao = new Leilao("Moutain Bike");
-
-            leilao.Propoe(new Lance(joao, 100.0));
-            leilao.Propoe(new Lance(maria, 200.0));
-            leilao.Propoe(new Lance(joao, 300.0));
-
-            //actions
-            Avaliador avaliador = new Avaliador();
-            avaliador.Avalia(leilao);
-            IList<Lance> maiores = avaliador.TresMaiores;
+            Leilao leilao = new CriadoDeLeilao().Para("Moutain Bike")
+                .Lance(this.joao, 100.0)
+                .Lance(this.maria, 200.0)
+                .Lance(this.joao, 300.0)
+                .Constroi();
+            
+            this.CriaAvaliador();
+            this.leiloeiro.Avalia(leilao);
+            IList<Lance> maiores = this.leiloeiro.TresMaiores;
 
             //tests
             Assert.AreEqual(3, maiores.Count);
             Assert.AreEqual(300, maiores[0].Valor);
             Assert.AreEqual(200, maiores[1].Valor);
             Assert.AreEqual(100, maiores[2].Valor);
-
         }
 
         [TestMethod]
         public void DeveDevolverTodosLancesCasoTenhaApenasDoisLances()
         {
-            Usuario joao = new Usuario("João");
-            Usuario maria = new Usuario("Maria");
-            Leilao leilao = new Leilao("Playstation 3 Novo");
+            Leilao leilao = new CriadoDeLeilao().Para("Playstation 3 Novo")
+                .Lance(this.joao, 100.0)
+                .Lance(this.maria, 200.0)
+                .Constroi();
+            
+            this.CriaAvaliador();
+            this.leiloeiro.Avalia(leilao);
 
-            leilao.Propoe(new Lance(joao, 100.0));
-            leilao.Propoe(new Lance(maria, 200.0));
-
-            Avaliador leiloeiro = new Avaliador();
-
-            leiloeiro.Avalia(leilao);
             var maiores = leiloeiro.TresMaiores;
 
             Assert.AreEqual(2, maiores.Count);
@@ -84,22 +94,20 @@ namespace TDD.LeilaoTests
         [TestMethod]
         public void TestaAvaliadorComApenasUmLance()
         {
-            Usuario cassio = new Usuario("Cassio");
-            Leilao leilao = new Leilao("Travel to England");
-
-            leilao.Propoe(new Lance(cassio, 200));
-
-            //actions
-            Avaliador avaliador = new Avaliador();
-            avaliador.Avalia(leilao);
+            Leilao leilao = new CriadoDeLeilao().Para("Travel to England")
+                .Lance(this.joao, 200.0)
+                .Constroi();
+            
+            this.CriaAvaliador();
+            this.leiloeiro.Avalia(leilao);
 
             //compare
             double maiorEsperado = 200;
             double menorEsperado = 200;
             
             //tests
-            Assert.AreEqual(maiorEsperado, avaliador.MaiorLance);
-            Assert.AreEqual(menorEsperado, avaliador.MenorLance);
+            Assert.AreEqual(maiorEsperado, this.leiloeiro.MaiorLance);
+            Assert.AreEqual(menorEsperado, this.leiloeiro.MenorLance);
         }
 
         [TestMethod]
@@ -117,48 +125,39 @@ namespace TDD.LeilaoTests
         [TestMethod]
         public void TestaAvaliadorComValoresAleatorios()
         {
-            Usuario cassio = new Usuario("Cassio");
-            Usuario josias = new Usuario("Josias");
-            Usuario meredith = new Usuario("Meredith");
-            Usuario bob = new Usuario("Bob");
+            Leilao leilao = new CriadoDeLeilao().Para("Travel to England")
+                .Lance(this.maria, 400)
+                .Lance(this.jose, 300)
+                .Lance(this.joao, 200)
+                .Lance(this.jose, 100)
+                .Constroi();
 
-            Leilao leilao = new Leilao("Travel to England");
-
-            leilao.Propoe(new Lance(cassio, 400));
-            leilao.Propoe(new Lance(bob, 300));
-            leilao.Propoe(new Lance(josias, 200));
-            leilao.Propoe(new Lance(meredith, 100));
-            
-            //actions
-            Avaliador avaliador = new Avaliador();
-            avaliador.Avalia(leilao);
+            this.CriaAvaliador();
+            this.leiloeiro.Avalia(leilao);
 
             //compare
             double maiorEsperado = 400;
             double menorEsperado = 100;
             
             //tests
-            Assert.AreEqual(maiorEsperado, avaliador.MaiorLance);
-            Assert.AreEqual(menorEsperado, avaliador.MenorLance);
+            Assert.AreEqual(maiorEsperado, this.leiloeiro.MaiorLance);
+            Assert.AreEqual(menorEsperado, this.leiloeiro.MenorLance);
         }
 
         [TestMethod]
         public void Testa2LancesEmSequenciaDeUsuario()
         {
-            Usuario cassio = new Usuario("Cassio");
-            Usuario josias = new Usuario("Josias");
-
-            Leilao leilao = new Leilao("Travel to Canada");
-
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(cassio, 2000));
-            leilao.Propoe(new Lance(cassio, 3000));
-            leilao.Propoe(new Lance(josias, 4000));
+            Leilao leilao = new CriadoDeLeilao().Para("Travel to Canada")
+                .Lance(this.maria, 1000)
+                .Lance(this.maria, 2000)
+                .Lance(this.maria, 3000)
+                .Lance(this.jose, 4000)
+                .Constroi();
             
             //tests
             Assert.AreEqual(2, leilao.Lances.Count);
             
-            leilao.Propoe(new Lance(cassio, 1000));
+            leilao.Propoe(new Lance(this.maria, 1000));
 
             //tests
             Assert.AreEqual(3, leilao.Lances.Count);
@@ -167,23 +166,20 @@ namespace TDD.LeilaoTests
         [TestMethod]
         public void NaoDeveAceitarMaisDoQue5LancesDeUmMesmoUsuario()
         {
-            Usuario cassio = new Usuario("Cassio");
-            Usuario josias = new Usuario("Josias");
-
-            Leilao leilao = new Leilao("Travel to Canada");
-
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(josias, 2000));
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(josias, 2000));
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(josias, 2000));
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(josias, 2000));
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(josias, 2000));
-            leilao.Propoe(new Lance(cassio, 1000));
-
+            Leilao leilao = new CriadoDeLeilao().Para("Travel to Canada")
+                .Lance(this.jose, 1000)
+                .Lance(this.maria, 2000)
+                .Lance(this.jose, 1000)
+                .Lance(this.maria, 2000)
+                .Lance(this.jose, 1000)
+                .Lance(this.maria, 2000)
+                .Lance(this.jose, 1000)
+                .Lance(this.maria, 2000)
+                .Lance(this.jose, 1000)
+                .Lance(this.maria, 2000)
+                .Lance(this.jose, 1000)
+                .Constroi();
+            
             //tests
             Assert.AreEqual(10, leilao.Lances.Count);
         }
@@ -191,14 +187,12 @@ namespace TDD.LeilaoTests
         [TestMethod]
         public void TestaDobrarLanceDeUmUsuario()
         {
-            Usuario cassio = new Usuario("Cassio");
-            Usuario josias = new Usuario("Josias");
-
-            Leilao leilao = new Leilao("Travel to Canada");
-
-            leilao.Propoe(new Lance(cassio, 1000));
-            leilao.Propoe(new Lance(josias, 1100));
-            leilao.DobrarLance(cassio);
+            Leilao leilao = new CriadoDeLeilao().Para("Travel to Canada")
+                .Lance(this.jose, 1000)
+                .Lance(this.maria, 1100)
+                .Constroi();
+            
+            leilao.DobrarLance(this.jose);
 
             Assert.AreEqual(3, leilao.Lances.Count);
         }
@@ -206,19 +200,26 @@ namespace TDD.LeilaoTests
         [TestMethod]
         public void NaoDeveDobrarCasoUsuarioNaoTenhaDadoLance()
         {
-            Usuario cassio = new Usuario("Cassio");
-            Usuario josias = new Usuario("Josias");
-
-            Leilao leilao = new Leilao("Travel to Canada");
-
-            leilao.Propoe(new Lance(cassio, 1000));
-
-            leilao.DobrarLance(josias);
+            Leilao leilao = new CriadoDeLeilao().Para("Travel to Canada")
+                .Lance(this.joao, 1000)
+                .Constroi();
+            
+            leilao.DobrarLance(this.jose);
 
             Assert.AreEqual(1, leilao.Lances.Count);
 
         }
 
-        
+        [ExpectedException(typeof(Exception))]
+        [TestMethod]
+        public void NaoDeveAvailiarLeilaoSemLance()
+        {
+            Leilao leilao = new CriadoDeLeilao()
+                .Para("Videocassete")
+                .Constroi();
+
+            leiloeiro.Avalia(leilao);
+
+        }
     }
 }

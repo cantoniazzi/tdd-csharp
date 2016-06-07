@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Avaliador.cs" />
+    <Compile Include="CriadoDeLeilao.cs" />
     <Compile Include="FiltroDeLances.cs" />
     <Compile Include="Lance.cs" />
     <Compile Include="Leilao.cs" />
